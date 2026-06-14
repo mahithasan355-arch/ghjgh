@@ -10,6 +10,7 @@ import {
   NotebookPen,
   Play,
   Sparkles,
+  Check,
 } from "lucide-react";
 import {
   SortBarsPreview,
@@ -22,6 +23,42 @@ import { PROBLEM_COUNT } from "@/lib/problems";
 import { VISUALIZERS } from "@/pages/visualizers/registry";
 import { VizThumb } from "@/pages/visualizers/VizThumb";
 import { cn } from "@/lib/cn";
+
+/* A lightweight "browser chrome" frame so live previews read as real product
+ * screenshots — the professional, app-forward look of a modern landing page. */
+function BrowserFrame({
+  url,
+  badge,
+  children,
+  className,
+}: {
+  url: string;
+  badge?: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={cn("card card-hover overflow-hidden", className)}>
+      <div className="flex items-center gap-2 border-b border-line bg-elevated/60 px-4 py-2.5">
+        <span className="flex gap-1.5" aria-hidden="true">
+          <span className="h-2.5 w-2.5 rounded-full bg-swap/70" />
+          <span className="h-2.5 w-2.5 rounded-full bg-pivot/70" />
+          <span className="h-2.5 w-2.5 rounded-full bg-run/70" />
+        </span>
+        <div className="ml-2 flex-1 truncate rounded-md bg-base/70 px-3 py-1 text-center font-mono text-[11px] text-subtle">
+          {url}
+        </div>
+        {badge && (
+          <span className="hidden shrink-0 items-center gap-1 rounded-full bg-run/15 px-2.5 py-1 text-[11px] font-semibold text-run sm:inline-flex">
+            <span className="h-1.5 w-1.5 animate-pulse-glow rounded-full bg-run" />
+            {badge}
+          </span>
+        )}
+      </div>
+      <div className="relative">{children}</div>
+    </div>
+  );
+}
 
 /* Editorial feature row: prose on one side, a floating paper card on the other. */
 function FeatureRow({
@@ -45,15 +82,21 @@ function FeatureRow({
     <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
       <div className={cn(reverse && "lg:order-2")}>
         <p className="eyebrow mb-4">{eyebrow}</p>
-        <h2 className="font-display text-4xl font-semibold leading-[1.05] tracking-tight sm:text-5xl">
+        <h2 className="font-display text-4xl font-semibold leading-[1.05] tracking-tight text-balance sm:text-5xl">
           <span className={leadClass}>{lead}</span> {rest}
         </h2>
         <ul className="mt-6 space-y-3">
           {points.map((p) => (
             <li key={p} className="flex gap-3 text-[15px] leading-relaxed text-muted">
               <span
-                className={cn("mt-2 h-1.5 w-1.5 shrink-0 rounded-full", leadClass.replace("text-", "bg-"))}
-              />
+                className={cn(
+                  "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full",
+                  leadClass.replace("text-", "bg-") + "/15",
+                  leadClass,
+                )}
+              >
+                <Check className="h-3 w-3" strokeWidth={3} />
+              </span>
               {p}
             </li>
           ))}
@@ -71,7 +114,7 @@ const PILLARS = [
   { icon: MonitorPlay, title: "Watch", desc: "Every concept pairs with a live, step-through visualizer.", accent: "text-compare" },
   { icon: Code2, title: "Play", desc: "Run real Python in the in-browser playground.", accent: "text-pivot" },
   { icon: FlaskConical, title: "Practice", desc: "Laddered problems graded against hidden tests.", accent: "text-swap" },
-  { icon: NotebookPen, title: "Note", desc: "Jot notes per lesson — and sync them across devices.", accent: "text-visited" },
+  { icon: NotebookPen, title: "Note", desc: "Jot notes per lesson, saved right in your browser.", accent: "text-visited" },
 ];
 
 const TINT: Record<string, string> = {
@@ -83,6 +126,8 @@ const TINT: Record<string, string> = {
 };
 
 const FEATURED_IDS = ["sorting", "pathfinding", "trees", "graphs", "dp", "greedy"];
+
+const HIGHLIGHTS = ["Runs in your browser", "No signup required", "Free & open source"];
 
 export function HomePage() {
   const vizById = Object.fromEntries(VISUALIZERS.map((v) => [v.id, v]));
@@ -98,19 +143,17 @@ export function HomePage() {
   return (
     <div className="mx-auto max-w-6xl px-5 sm:px-6">
       {/* Hero */}
-      <section className="grid grid-cols-1 items-center gap-12 py-16 lg:grid-cols-[1.1fr_1fr] lg:py-24">
+      <section className="grid grid-cols-1 items-center gap-12 py-14 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:py-24">
         <div className="animate-fade-in">
-          <p className="eyebrow mb-5 inline-flex items-center gap-2">
+          <p className="eyebrow mb-5 inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1.5">
             <Sparkles className="h-3.5 w-3.5 text-pivot" />
             The interactive DSA handbook
           </p>
-          <h1 className="font-display text-5xl font-semibold leading-[0.98] tracking-tight sm:text-6xl lg:text-7xl">
-            <span className="text-swap">Visualize</span> every
-            <br />
-            algorithm.
+          <h1 className="font-display text-5xl font-semibold leading-[0.98] tracking-tight text-balance sm:text-6xl lg:text-7xl">
+            <span className="text-swap">Visualize</span> every algorithm.
           </h1>
-          <p className="mt-6 max-w-md text-lg leading-relaxed text-muted">
-            Don't just read about data structures and algorithms — watch them
+          <p className="mt-6 max-w-md text-lg leading-relaxed text-muted text-pretty">
+            Don&apos;t just read about data structures and algorithms — watch them
             run. Step through real executions, rewind any line, and experiment
             with your own inputs.
           </p>
@@ -127,36 +170,53 @@ export function HomePage() {
               Jump to a visualizer
             </Link>
           </div>
-          <p className="mt-5 text-xs text-subtle">Free · no signup · runs entirely in your browser.</p>
+          <ul className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2">
+            {HIGHLIGHTS.map((h) => (
+              <li key={h} className="flex items-center gap-1.5 text-sm text-subtle">
+                <Check className="h-4 w-4 text-run" strokeWidth={2.5} />
+                {h}
+              </li>
+            ))}
+          </ul>
         </div>
 
         <div className="animate-fade-in [animation-delay:120ms]">
-          <div className="card card-hover h-80 overflow-hidden sm:h-96">
-            <SortBarsPreview />
-          </div>
+          <BrowserFrame url="algolume.app/visualizers/sorting" badge="Live" className="h-80 sm:h-96 lg:h-[26rem]">
+            <div className="h-[calc(20rem-46px)] sm:h-[calc(24rem-46px)] lg:h-[calc(26rem-46px)]">
+              <SortBarsPreview />
+            </div>
+          </BrowserFrame>
         </div>
       </section>
 
       {/* Stats strip */}
-      <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {stats.map((s) => (
-          <div key={s.label} className="rounded-xl border border-line bg-surface px-4 py-4 text-center">
-            <div className="font-display text-3xl font-semibold tracking-tight text-fg">{s.value}</div>
-            <div className="mt-0.5 text-xs font-medium uppercase tracking-wider text-subtle">{s.label}</div>
-          </div>
-        ))}
+      <section className="overflow-hidden rounded-2xl border border-line bg-surface">
+        <div className="grid grid-cols-2 divide-line sm:grid-cols-4 sm:divide-x">
+          {stats.map((s) => (
+            <div key={s.label} className="px-4 py-6 text-center">
+              <div className="font-display text-4xl font-semibold tracking-tight text-fg">{s.value}</div>
+              <div className="mt-1 text-xs font-medium uppercase tracking-wider text-subtle">{s.label}</div>
+            </div>
+          ))}
+        </div>
       </section>
 
       {/* Five pillars */}
-      <section className="py-16">
-        <p className="eyebrow mb-3">All in one page</p>
-        <h2 className="mb-8 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-          Five ways to learn, woven together.
-        </h2>
+      <section className="py-16 sm:py-20">
+        <div className="mb-8 max-w-2xl">
+          <p className="eyebrow mb-3">All in one page</p>
+          <h2 className="font-display text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
+            Five ways to learn, woven together.
+          </h2>
+          <p className="mt-3 text-muted text-pretty">
+            Reading, watching, coding, practicing, and note-taking — each reinforcing the next,
+            all in a single uninterrupted flow.
+          </p>
+        </div>
         <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
           {PILLARS.map((p) => (
-            <div key={p.title} className="card flex flex-col gap-2 p-4">
-              <span className={cn("flex h-9 w-9 items-center justify-center rounded-lg bg-elevated", p.accent)}>
+            <div key={p.title} className="card card-hover flex flex-col gap-3 p-5">
+              <span className={cn("flex h-10 w-10 items-center justify-center rounded-xl", TINT[p.accent], p.accent)}>
                 <p.icon className="h-5 w-5" />
               </span>
               <h3 className="font-display text-base font-semibold text-fg">{p.title}</h3>
@@ -214,11 +274,11 @@ export function HomePage() {
       </section>
 
       {/* Featured visualizers */}
-      <section className="py-16">
+      <section className="py-16 sm:py-20">
         <div className="mb-8 flex items-end justify-between gap-4">
           <div>
             <p className="eyebrow mb-3">Start exploring</p>
-            <h2 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+            <h2 className="font-display text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
               Jump straight into a visualizer.
             </h2>
           </div>
@@ -250,19 +310,27 @@ export function HomePage() {
             </Link>
           ))}
         </div>
+        <Link
+          to="/visualizers"
+          className="mt-6 flex items-center justify-center gap-1 text-sm font-semibold text-run hover:underline sm:hidden"
+        >
+          All visualizers
+          <ArrowRight className="h-4 w-4" />
+        </Link>
       </section>
 
       {/* Closing CTA */}
       <section className="pb-20">
-        <div className="card overflow-hidden p-10 text-center sm:p-14">
-          <h2 className="mx-auto max-w-2xl font-display text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
+        <div className="card overflow-hidden p-10 text-center sm:p-16">
+          <p className="eyebrow mb-4">Ready when you are</p>
+          <h2 className="mx-auto max-w-2xl font-display text-3xl font-semibold leading-tight tracking-tight text-balance sm:text-5xl">
             Stop memorizing. Start <span className="text-run">seeing</span> how it works.
           </h2>
-          <p className="mx-auto mt-4 max-w-md text-muted">
+          <p className="mx-auto mt-4 max-w-md text-muted text-pretty">
             Read, watch it run, run your own code, and prove it with problems — from
             Big-O all the way to bitmask DP.
           </p>
-          <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link to="/learn" className="btn-primary text-base">
               <BookOpen className="h-4 w-4" />
               Start with the handbook

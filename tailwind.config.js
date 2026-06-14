@@ -5,9 +5,9 @@
 // swap between light and dark in index.css.
 const token = (name) => `rgb(var(--${name}) / <alpha-value>)`;
 
-export default {
+module.exports = {
   darkMode: "class",
-  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  content: ["./app/**/*.{js,ts,jsx,tsx}", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
       colors: {

@@ -6,15 +6,12 @@ import { getLesson } from "@/content";
 import { MarkdownLite } from "@/components/lesson/MarkdownLite";
 import { clearAllProgress, useCompleted } from "@/lib/progress";
 import { clearAllSolved, useSolved } from "@/lib/problems/solved";
-import { isSupabaseConfigured } from "@/lib/supabase";
-import { useAuth } from "@/lib/auth";
 
 export function NotesPage() {
   const [tick, setTick] = useState(0);
   const [query, setQuery] = useState("");
   const completed = useCompleted();
   const solved = useSolved();
-  const { user } = useAuth();
   const allNotes = useMemo(() => {
     void tick; // re-read after edits/deletes
     return getAllNotes().map((n) => {
@@ -69,7 +66,6 @@ export function NotesPage() {
           </h1>
           <p className="mt-3 text-muted">
             {allNotes.length} note{allNotes.length === 1 ? "" : "s"}, saved on this device as you read.
-            {isSupabaseConfigured && !user && " Sign in to sync them across devices."}
           </p>
         </div>
         {allNotes.length > 0 && (

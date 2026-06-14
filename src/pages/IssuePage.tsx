@@ -6,7 +6,7 @@ const TO_EMAIL = "03mahirshahriar@gmail.com";
 // Optional: a Web3Forms access key (https://web3forms.com — free, tied to the
 // recipient email) sends the message straight to the inbox with no mail client.
 // Without it, we fall back to a prefilled mailto: link.
-const WEB3FORMS_KEY = import.meta.env.VITE_WEB3FORMS_KEY as string | undefined;
+const WEB3FORMS_KEY = process.env.NEXT_PUBLIC_WEB3FORMS_KEY as string | undefined;
 
 type Kind = "bug" | "idea" | "content" | "other";
 const KINDS: { id: Kind; label: string; icon: typeof Bug }[] = [
